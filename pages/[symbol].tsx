@@ -49,9 +49,9 @@ export default function StockPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-red-50 to-rose-100">
       <Head>
-        <title>{symbol ? `${symbol.toString()} - YOLOcharts` : 'YOLOcharts'}</title>
+        <title>{symbol ? `${symbol.toString()} - YoloTerminal` : 'YoloTerminal'}</title>
         <meta name="description" content={`Stock analysis for ${symbol}`} />
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -59,12 +59,20 @@ export default function StockPage() {
 
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center">
-          <h1 
-            onClick={() => router.push('/')} 
-            className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-4 sm:mb-0 cursor-pointer"
-          >
-            YOLOcharts
-          </h1>
+          <div className="flex items-center mb-4 sm:mb-0">
+            <img 
+              src="/logo.png" 
+              alt="YoloTerminal Logo" 
+              className="h-8 w-auto mr-3 cursor-pointer"
+              onClick={() => router.push('/')}
+            />
+            <h1 
+              onClick={() => router.push('/')} 
+              className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-rose-600 cursor-pointer"
+            >
+              YoloTerminal
+            </h1>
+          </div>
           <SearchBar onSearch={handleSearch} className="w-full sm:w-auto sm:max-w-md" />
         </div>
       </header>
@@ -92,18 +100,18 @@ export default function StockPage() {
       <footer className="bg-gray-100 py-4">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm text-gray-600">
-            &copy; {new Date().getFullYear()} YOLOcharts. All rights reserved.
+            &copy; {new Date().getFullYear()} YoloTerminal. All rights reserved.
           </p>
           <div className="mt-2 space-y-2 sm:space-y-0">
-            <a href="/privacy" className="text-sm text-blue-600 hover:text-blue-800 mr-0 sm:mr-4 block sm:inline">
+            <a href="/privacy" className="text-sm text-red-600 hover:text-red-800 mr-0 sm:mr-4 block sm:inline">
               Privacy Policy
             </a>
-            <a href="/terms" className="text-sm text-blue-600 hover:text-blue-800 block sm:inline">
+            <a href="/terms" className="text-sm text-red-600 hover:text-red-800 block sm:inline">
               Terms of Service
             </a>
           </div>
           <p className="mt-2 text-xs text-gray-500">
-            Disclaimer: YOLOcharts is not a financial advisor. The information provided on this platform should not be considered as financial advice.
+            Disclaimer: YoloTerminal is not a financial advisor. The information provided on this platform should not be considered as financial advice.
           </p>
         </div>
       </footer>
