@@ -8,6 +8,11 @@ type StockSuggestion = {
   country: string
 }
 
+type SearchBarProps = {
+  onSearch: (symbol: string) => void
+  className?: string
+}
+
 const debounce = <F extends (...args: any[]) => any>(func: F, delay: number) => {
   let timeoutId: NodeJS.Timeout
   return (...args: Parameters<F>) => {
@@ -16,15 +21,22 @@ const debounce = <F extends (...args: any[]) => any>(func: F, delay: number) => 
   }
 }
 
-type SearchBarProps = {
-  onSearch: (symbol: string) => void
-  className?: string
-}
-
 export default function SearchBar({ onSearch, className = '' }: SearchBarProps) {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<StockSuggestion[]>([])
   const [isLoading, setIsLoading] = useState(false)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (query.trim()) {
+      onSearch(query.trim())
+    }
+  }
+
+  const handleClearInput = () => {
+    setQuery('')
+    setSuggestions([])
+  }
 
   const fetchSuggestions = useCallback(async (input: string) => {
     if (input.length < 2) {
@@ -46,18 +58,26 @@ export default function SearchBar({ onSearch, className = '' }: SearchBarProps) 
     } finally {
       setIsLoading(false)
     }
-  }, []) // Empty dependency array as it doesn't depend on any props or state
+  }, []) 
 
   const debouncedFetch = useCallback(
-    debounce((input: string) => {
+    (input: string) => {
       fetchSuggestions(input)
-    }, 300),
+    },
     [fetchSuggestions]
   )
 
   useEffect(() => {
-    debouncedFetch(query)
-  }, [query, debouncedFetch]) // Added debouncedFetch as a dependency
+    const timeoutId = setTimeout(() => {
+      if (query) {
+        debouncedFetch(query)
+      } else {
+        setSuggestions([])
+      }
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [query, debouncedFetch])
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value)
@@ -67,18 +87,6 @@ export default function SearchBar({ onSearch, className = '' }: SearchBarProps) 
     setQuery(suggestion.symbol)
     setSuggestions([])
     onSearch(suggestion.symbol)
-  }
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (query) {
-      onSearch(query)
-    }
-  }
-
-  const handleClearInput = () => {
-    setQuery('')
-    setSuggestions([])
   }
 
   return (
