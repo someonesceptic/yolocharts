@@ -26,34 +26,38 @@ export default function SearchBar({ onSearch, className = '' }: SearchBarProps) 
   const [suggestions, setSuggestions] = useState<StockSuggestion[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  const fetchSuggestions = useCallback(
-    debounce(async (input: string) => {
-      if (input.length < 2) {
-        setSuggestions([])
-        return
-      }
+  const fetchSuggestions = useCallback(async (input: string) => {
+    if (input.length < 2) {
+      setSuggestions([])
+      return
+    }
 
-      setIsLoading(true)
-      try {
-        const response = await fetch(`/api/stockSuggestions?query=${encodeURIComponent(input)}`)
-        if (!response.ok) {
-          throw new Error('Failed to fetch suggestions')
-        }
-        const data = await response.json()
-        setSuggestions(data)
-      } catch (error) {
-        console.error('Error fetching suggestions:', error)
-        setSuggestions([])
-      } finally {
-        setIsLoading(false)
+    setIsLoading(true)
+    try {
+      const response = await fetch(`/api/stockSuggestions?query=${encodeURIComponent(input)}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch suggestions')
       }
+      const data = await response.json()
+      setSuggestions(data)
+    } catch (error) {
+      console.error('Error fetching suggestions:', error)
+      setSuggestions([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, []) // Empty dependency array as it doesn't depend on any props or state
+
+  const debouncedFetch = useCallback(
+    debounce((input: string) => {
+      fetchSuggestions(input)
     }, 300),
-    []
+    [fetchSuggestions]
   )
 
   useEffect(() => {
-    fetchSuggestions(query)
-  }, [query, fetchSuggestions])
+    debouncedFetch(query)
+  }, [query, debouncedFetch]) // Added debouncedFetch as a dependency
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value)

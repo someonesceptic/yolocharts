@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import Link from 'next/link'
+import Image from 'next/image'
 import SearchBar from '@/components/searchbar'
 import Heatmap from '@/components/heatmap'
 import TipBanner from '@/components/TipBanner'
@@ -17,7 +19,6 @@ export default function StockPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Effect for fetching data
   useEffect(() => {
     const fetchData = async () => {
       if (!router.query.symbol) return
@@ -62,11 +63,14 @@ export default function StockPage() {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center">
           <div className="flex items-center mb-4 sm:mb-0">
-            <img 
+            <Image 
               src="/logo.png" 
               alt="Logo" 
-              className="h-8 w-auto mr-3 cursor-pointer"
+              width={32}
+              height={32}
+              className="w-auto mr-3 cursor-pointer"
               onClick={() => router.push('/')}
+              priority
             />
             <h1 
               onClick={() => router.push('/')} 
@@ -123,12 +127,18 @@ export default function StockPage() {
             &copy; {new Date().getFullYear()} YoloTerminal. All rights reserved.
           </p>
           <div className="mt-2 space-y-2 sm:space-y-0">
-            <a href="/privacy" className="text-sm text-red-600 hover:text-red-800 mr-0 sm:mr-4 block sm:inline">
+            <Link 
+              href="/privacy" 
+              className="text-sm text-red-600 hover:text-red-800 mr-0 sm:mr-4 block sm:inline"
+            >
               Privacy Policy
-            </a>
-            <a href="/terms" className="text-sm text-red-600 hover:text-red-800 block sm:inline">
+            </Link>
+            <Link 
+              href="/terms" 
+              className="text-sm text-red-600 hover:text-red-800 block sm:inline"
+            >
               Terms of Service
-            </a>
+            </Link>
           </div>
           <p className="mt-2 text-xs text-gray-500">
             Disclaimer: YoloTerminal is not a financial advisor. The information provided on this platform should not be considered as financial advice.
