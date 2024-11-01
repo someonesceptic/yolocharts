@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import SearchBar from '../components/searchbar'
-import Heatmap from '../components/heatmap'
+import SearchBar from '@/components/searchbar'
+import Heatmap from '@/components/heatmap'
+import TipBanner from '@/components/TipBanner'
 
 type MonthlyReturn = {
   year: number
@@ -12,26 +13,26 @@ type MonthlyReturn = {
 
 export default function StockPage() {
   const router = useRouter()
-  const { symbol } = router.query
   const [stockData, setStockData] = useState<MonthlyReturn[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Effect for fetching data
   useEffect(() => {
     const fetchData = async () => {
-      if (!symbol) return // Return early if no symbol
+      if (!router.query.symbol) return
 
       setIsLoading(true)
       setError(null)
 
       try {
-        const response = await fetch(`/api/stockData?symbol=${encodeURIComponent(symbol.toString())}`)
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to fetch stock data')
+        const response = await fetch(`/api/stockData?symbol=${encodeURIComponent(router.query.symbol.toString())}`)
+        const data = await response.json()
+
+        if ('error' in data) {
+          throw new Error(data.error)
         }
 
-        const data = await response.json()
         setStockData(data)
       } catch (err) {
         console.error('Error fetching stock data:', err)
@@ -41,20 +42,21 @@ export default function StockPage() {
       }
     }
 
-    if (symbol) fetchData()
-  }, [symbol])
+    if (router.isReady) {
+      fetchData()
+    }
+  }, [router.isReady, router.query.symbol])
 
-  const handleSearch = async (newSymbol: string) => {
+  const handleSearch = (newSymbol: string) => {
     router.push(`/${newSymbol}`)
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-red-50 to-rose-100">
       <Head>
-        <title>{symbol ? `${symbol.toString()} - YoloTerminal` : 'YoloTerminal'}</title>
-        <meta name="description" content={`Stock analysis for ${symbol}`} />
-        <link rel="icon" href="/favicon.ico" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>
+          {router.query.symbol ? `${router.query.symbol.toString().toUpperCase()} - Stock Analysis` : 'Stock Analysis'}
+        </title>
       </Head>
 
       <header className="bg-white shadow-sm">
@@ -62,7 +64,7 @@ export default function StockPage() {
           <div className="flex items-center mb-4 sm:mb-0">
             <img 
               src="/logo.png" 
-              alt="YoloTerminal Logo" 
+              alt="Logo" 
               className="h-8 w-auto mr-3 cursor-pointer"
               onClick={() => router.push('/')}
             />
@@ -77,25 +79,43 @@ export default function StockPage() {
         </div>
       </header>
 
-      <main className="flex-grow px-4 py-8">
-        <div className="w-full max-w-6xl mx-auto space-y-8">
-          <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-800">
-            {symbol && `${symbol.toString()} Analysis`}
-          </h2>
-          {isLoading ? (
-            <div className="text-center py-8">Loading...</div>
-          ) : error ? (
-            <div className="text-center py-8 text-red-600">{error}</div>
-          ) : stockData.length > 0 ? (
-            <div className="bg-white rounded-lg shadow-lg p-2 sm:p-4 md:p-6 overflow-x-auto">
-              <h3 className="text-lg font-semibold mb-2">Monthly Returns Heatmap</h3>
-              <Heatmap data={stockData} />
-            </div>
-          ) : (
-            <div className="text-center py-8">No data available</div>
+      <main className="flex-grow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {router.query.symbol && (
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">
+              {router.query.symbol.toString().toUpperCase()} Analysis
+            </h2>
           )}
+
+          <div className="flex justify-center">
+            <div className="w-full max-w-6xl">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-lg">Loading...</div>
+                </div>
+              ) : error ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-red-600">{error}</div>
+                </div>
+              ) : stockData.length > 0 ? (
+                <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 overflow-x-auto">
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-gray-800">Monthly Returns Heatmap</h3>
+                    <p className="text-sm text-gray-600">Historical monthly returns analysis</p>
+                  </div>
+                  <Heatmap data={stockData} />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-gray-600">No data available</div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </main>
+
+      <TipBanner />
 
       <footer className="bg-gray-100 py-4">
         <div className="container mx-auto px-4 text-center">

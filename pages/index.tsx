@@ -32,7 +32,7 @@ export default function Home() {
       <main className="flex-grow flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-3xl text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-rose-600 mb-12 leading-tight py-2 relative z-0">
-            Discover and analyze<br className="hidden sm:inline" /> global stocks with ease
+            Discover and analyze<br className="hidden sm:inline" /> global stocks
           </h2>
           <div className="relative z-10">
             <SearchBar onSearch={handleSearch} className="w-full max-w-xl mx-auto" />
